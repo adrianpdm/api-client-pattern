@@ -33,14 +33,14 @@ API client configuration pattern demonstrated within this project is meant to so
 |   ├── auth.js
 |   ├── ...
 |   ├── news.js
-|   ├── user.js
+|   └── user.js
 ├── api-client
 |   ├── main.client.js
 |   ├── ...
 |   ├── some-auth-service.client.js
-|   ├── some-third-party.client.js
+|   └── some-third-party.client.js
 ├── api-utils
-├── tests
+└── tests
 ```
 
 | Folder        | Description   |
@@ -233,10 +233,10 @@ Instead of calling `axios` method directly, e.g `axios#get`, `axios#post`, creat
 ```raw
 .
 ├── api
-│   └── article.js
-│   └── ...
-│   └── news.js
-│   ├── user.js
+│   ├── article.js
+│   ├── ...
+│   ├── news.js
+│   └── user.js
 ``` 
 
 For example, in `user.js`
