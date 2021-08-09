@@ -201,7 +201,7 @@ import fixtureData from '/path/to/fixture'
 
 const mock = new MockAdapter(instance)
 mock.onAny('/something').replyOnce(200, fixtureData)
-getUserById.call(mock)
+getUserById.call(mock, '290191')
     .then((res) => {
         // handle response
     })
@@ -215,12 +215,12 @@ You can also supply an empty axios instance for the mock adapter. Just be aware 
     import MockAdapter from 'axios-mock-adapter'
 -   import { instance } from '@/api-client/main.client'
 +   import axios from 'axios'
-    import { getSomething } from '@/api/_example'
+    import { getUserById } from '/api/user.js'
 
     const mock = new MockAdapter(axios.create({}))
     mock.onAny().replyOnce(200, fixtureData)
 
-    getSomething.call(mock)
+    getUserById.call(mock, '290191')
         .then((res) => {
             // handle response
         })
