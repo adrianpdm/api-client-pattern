@@ -1,6 +1,5 @@
 import axios from 'axios'
 import { baseRequest } from '../api-utils/axios.base-request'
-import { createMock } from '../api-utils/axios.mock'
 
 function onRequestSuccess(config) {
   // TODO: define interceptor (if needed)
@@ -33,8 +32,6 @@ export const instance = (function () {
 
   return _instance
 })()
-
-export const mock = createMock(instance)
 
 export function request(config) {
   return baseRequest.call(this, config, instance)
