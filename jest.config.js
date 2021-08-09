@@ -15,6 +15,9 @@ module.exports = {
     '!babel.config.js',
     '!jest.config.js',
   ],
+  coverageReporters: [
+    "json-summary",
+  ],
   transform: {
     '^.+\\.js$': 'babel-jest',
   },
