@@ -1,0 +1,22 @@
+{
+  "name": "api-client-setup",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "lodash.merge": "^4.6.2"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.15.0",
+    "axios-mock-adapter": "^1.19.0",
+    "babel-jest": "^27.0.6",
+    "jest": "^27.0.6"
+  }
+}
