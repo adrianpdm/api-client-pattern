@@ -1,3 +1,5 @@
+![](./coverage-badges/badge-branches.svg)  ![](./coverage-badges/badge-functions.svg)  ![](./coverage-badges/badge-lines.svg)  ![](./coverage-badges/badge-statements.svg)
+
 # Setting Up API client
 
 There are a number of use cases regarding API client within front-end application. Some of them includes:
