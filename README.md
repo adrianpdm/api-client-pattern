@@ -212,7 +212,7 @@ getUserById.call(mock)
 
 You can also supply an empty axios instance for the mock adapter. Just be aware that it might not behave the same as pre-configured axios instance, especially when such instance include interceptors etc.
 ```diff
-import MockAdapter from 'axios-mock-adapter'
+    import MockAdapter from 'axios-mock-adapter'
 -   import { instance } from '@/api-client/main.client'
 +   import axios from 'axios'
     import { getSomething } from '@/api/_example'
