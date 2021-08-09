@@ -26,8 +26,151 @@ There are a number of use cases regarding API client within front-end applicatio
 API client configuration pattern demonstrated within this project is meant to solve above problems.
 
 ---
+## Folder structures
+```
+.
+├── api
+|   ├── auth.js
+|   ├── ...
+|   ├── news.js
+|   ├── user.js
+├── api-client
+|   ├── main.client.js
+|   ├── ...
+|   ├── some-auth-service.client.js
+|   ├── some-third-party.client.js
+├── api-utils
+├── tests
+```
 
-## Getting started
+| Folder        | Description   |
+| -             | -             |
+| api           | This is where all the abstracted request placed. Can be grouped by feature. |
+| api-client    | This is where we define API clients needed for the app. |
+| api-utils     | Some utilities regarding axios instance |
+| tests         | Unit test suites | 
+---
+## The benefits of this pattern
+
+### Each request can be overridden per request basis
+
+Say, the backend service is progressively migrating onto a different framework, and the migrated endpoints is accessible within `/v2/` route.
+
+```javascript
+import { getUserById, getUsers } from '/api/user.js'
+
+const customConfig = {
+    baseURL: `https://some.endpoint/v2`
+}
+// this points onto /v2/
+getUserById.call(customConfig, '290191')
+    .then((res) => {
+        // handle response
+    })
+    .catch((err) => {
+        // handle error
+    })
+
+// this points onto the default baseURL
+getUsers(1, 10)
+    .then((res) => {
+        // handle response
+    })
+    .catch((err) => {
+        // handle error
+    })
+```
+
+### Keeping asynchronous data flow, even when the backend service is not ready yet
+Sometimes during development, the backend service is not ready yet. In such condition, we can either choose to:
+- create a fixture, which then be **statically imported**
+    
+    While this is convenient, a static import is a totally different data flow than a network request, due to the asynchronicity.
+    ```javascript
+    // fixture/user-data.js
+    export default {
+        name: 'Adrian',
+        birthday: '1991-01-29'
+    }
+
+    // somewhere in your app
+    import userDataFixture from '/fixture/user-data'
+    
+    // fixture is accessed statically
+    let user = userDataFixture
+    ```
+
+- or, consume such fixture **within a simulated/mocked network request**
+
+    Using this method, we can still use the abstracted request method, but bound onto the mock adapter.
+    ```javascript
+    import userDataFixture from '/fixture/user-data'
+
+    mock.onAny().replyOnce(200, userDataFixture)
+    
+    let user
+    getUserById.call(mock, '290191')
+        .then((res) => {
+            // fixture is handled as if it was a network request
+            user = res.data
+        })
+        .catch((err) => {
+            // handle error
+        })
+    ```
+
+    Somewhere in the future, when the backend service is ready, we can simply remove the bound context.
+    ```diff
+    -   import userDataFixture from '/fixture/user-data'
+
+    -   mock.onAny().replyOnce(200, userDataFixture)
+        
+        let user
+    -   getUserById.call(mock, '290191')
+    +   getUserById('290191')
+            .then((res) => {
+                user = res.data
+            })
+            .catch((err) => {
+                // handle error
+            })
+    ```
+
+### Each abstracted request can be unit-tested
+
+We can unit test each request by importing the corresponding method.
+```javascript
+import MockAdapter from 'axios-mock-adapter'
+import { instance } from '/api-client/main.client'
+import { getUserById } from '/api/user.js'
+
+describe('API: user', () => {
+    test('getUserById: correctly returns user data', (done) => {
+        const userId = '290191'
+        const mock = new MockAdapter(instance)
+            .onAny()
+            .replyOnce(201, { /* user data fixture */ })
+
+        getUserById.call(mock, userId)
+            .then((res) => {
+                expect(res.data).toEqual(
+                    expect.objectContaining({
+                        /* expected object */
+                    })
+                )
+                done()
+            })
+            .catch(done)
+    })
+})
+```
+
+### Isolating our unit test environment from external service
+Mock server can be easily setup nowadays, some might use Postman/JsonServer for that. That said, unit test should only focus on how corresponding logic works locally. As for the actual network request, it should have been tested within the **integration test** environment.
+
+---
+
+## How to use this pattern
 
 ### Create API client
 1) Create the client instance in `/api-client` folder. For example, `main.client.js`.
@@ -230,125 +373,6 @@ You can also supply an empty axios instance for the mock adapter. Just be aware 
             // handle error
         })
 ```
-
----
-## The benefits of this pattern
-
-### Each request can be overridden per request basis
-
-Say, the backend service is progressively migrating onto a different framework, and the migrated endpoints is accessible within `/v2/` route.
-
-```javascript
-import { getUserById, getUsers } from '/api/user.js'
-
-const customConfig = {
-    baseURL: `https://some.endpoint/v2`
-}
-// this points onto /v2/
-getUserById.call(customConfig, '290191')
-    .then((res) => {
-        // handle response
-    })
-    .catch((err) => {
-        // handle error
-    })
-
-// this points onto the default baseURL
-getUsers(1, 10)
-    .then((res) => {
-        // handle response
-    })
-    .catch((err) => {
-        // handle error
-    })
-```
-
-### Keeping asynchronous data flow, even when the backend service is not ready yet
-Sometimes during development, the backend service is not ready yet. In such condition, we can either choose to:
-- create a fixture, which then be **statically imported**
-    
-    While this is convenient, a static import is a totally different data flow than a network request, due to the asynchronicity.
-    ```javascript
-    // fixture/user-data.js
-    export default {
-        name: 'Adrian',
-        birthday: '1991-01-29'
-    }
-
-    // somewhere in your app
-    import userDataFixture from '/fixture/user-data'
-    
-    // fixture is accessed statically
-    let user = userDataFixture
-    ```
-
-- or, consume such fixture **within a simulated/mocked network request**
-
-    Using this method, we can still use the abstracted request method, but bound onto the mock adapter.
-    ```javascript
-    import userDataFixture from '/fixture/user-data'
-
-    mock.onAny().replyOnce(200, userDataFixture)
-    
-    let user
-    getUserById.call(mock, '290191')
-        .then((res) => {
-            // fixture is handled as if it was a network request
-            user = res.data
-        })
-        .catch((err) => {
-            // handle error
-        })
-    ```
-
-    Somewhere in the future, when the backend service is ready, we can simply remove the bound context.
-    ```diff
-    -   import userDataFixture from '/fixture/user-data'
-
-    -   mock.onAny().replyOnce(200, userDataFixture)
-        
-        let user
-    -   getUserById.call(mock, '290191')
-    +   getUserById('290191')
-            .then((res) => {
-                user = res.data
-            })
-            .catch((err) => {
-                // handle error
-            })
-    ```
-
-### Each abstracted request can be unit-tested
-
-We can unit test each request by importing the corresponding method.
-```javascript
-import MockAdapter from 'axios-mock-adapter'
-import { instance } from '/api-client/main.client'
-import { getUserById } from '/api/user.js'
-
-describe('API: user', () => {
-    test('getUserById: correctly returns user data', (done) => {
-        const userId = '290191'
-        const mock = new MockAdapter(instance)
-            .onAny()
-            .replyOnce(201, { /* user data fixture */ })
-
-        getUserById.call(mock, userId)
-            .then((res) => {
-                expect(res.data).toEqual(
-                    expect.objectContaining({
-                        /* expected object */
-                    })
-                )
-                done()
-            })
-            .catch(done)
-    })
-})
-```
-
-### Isolating our unit test environment from external service
-Mock server can be easily setup nowadays, some might use Postman/JsonServer for that. That said, unit test should only focus on how corresponding logic works locally. As for the actual network request, it should have been tested within the **integration test** environment.
 
 ---
 
