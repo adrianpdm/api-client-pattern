@@ -1,6 +1,6 @@
 ![](./coverage-badges/badge-branches.svg)  ![](./coverage-badges/badge-functions.svg)  ![](./coverage-badges/badge-lines.svg)  ![](./coverage-badges/badge-statements.svg)
 
-# Setting Up API client
+# API Client Configuration Pattern
 
 There are a number of use cases regarding API client within front-end application. Some of them includes:
 1) **Single API client** (static)
