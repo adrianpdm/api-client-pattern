@@ -275,7 +275,7 @@ getUserById('290191')
     })
 ```
 
-### How to override network request config
+### How to override network request config (per request basis)
 This is used for API client with dynamic configuration, as mentioned in the (2) and (4) use cases.
 
 For example, we want to use version 2's baseURL, instead of the default version 1's.
@@ -314,6 +314,28 @@ async function () {
             // handle error
         })
 }
+```
+
+### How to override network request config (per instance basis)
+To override the configuration of an API client instance, we can use the exported instance and mutate its config.
+```javascript
+import { instance } from '/api-client/main.client'
+import _merge from 'lodash.merge'
+
+// as in previous example, customConfig can also be fetched asynchronously
+const customConfig = {
+    baseURL: 'https://some.endpoint/v2'
+}
+
+// we can use lodash.merge to merge multiple config object
+instance.defaults = _merge(instance.defaults, customConfig, /* ... */)
+
+// or just reset the default config with the new one
+instance.defaults = customConfig
+
+// all kinds of axios instance mutation should also applies here
+instance.interceptors.request.use(/* interceptors */)
+instance.interceptors.response.use(/* interceptors */)
 ```
 
 ### How to use a whole different API client
