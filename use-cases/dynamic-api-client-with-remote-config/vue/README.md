@@ -1,3 +1,5 @@
 # Dynamic API Client Configuration
 
-This project is created to demonstrate how to setup API client (axios) remote configuration
+This project is created to demonstrate how to setup API client (axios) remote configuration.
+
+![](./diagrams/sequences/plugin-installation.png)
