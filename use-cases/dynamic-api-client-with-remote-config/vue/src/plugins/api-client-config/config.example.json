@@ -1,0 +1,4 @@
+{
+  "/phone-books": "https://some.endpoint/v1",
+  "/videos": "https://some.endpoint/v2"
+}
