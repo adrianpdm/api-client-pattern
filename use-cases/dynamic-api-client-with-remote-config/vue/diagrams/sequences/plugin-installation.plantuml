@@ -1,0 +1,58 @@
+@startuml
+
+entity "vue app" as app
+boundary plugin
+boundary axios
+boundary vuex
+entity "config cache repo" as cache
+entity "config remote repo" as remote
+entity "backend service" as backend
+
+activate app
+app -> plugin++ : install ApiClientConfigPlugin
+
+plugin -> vuex : register module
+note over vuex
+M1
+end note
+vuex --> plugin : ok
+
+plugin -> axios : setup axios interceptor
+note over axios
+I1
+end note
+axios --> plugin : ok
+
+plugin --> app-- : ok
+
+app -> app : init app
+
+app -> app : render route
+app -> axios++ : perform XHR
+
+note over axios
+I1 intercept request
+end note
+
+axios -> vuex++ : get baseURL by endpoint
+vuex -> cache : get config from cache
+cache --> vuex : config
+vuex--
+
+alt cached config not found
+  vuex -> remote++ : get config from remote
+  remote -> cache++ : keep in cache
+  cache --> remote-- : ok
+  remote --> vuex : config
+  remote--
+  vuex--
+end
+
+vuex -> vuex : keep config in state
+vuex -> vuex : keep last fetch timestamp
+vuex --> axios : baseURL
+
+axios -> backend : XHR
+backend --> axios : ok
+
+@enduml
